@@ -148,6 +148,34 @@ animation: swapAnim 0.3s;
 <h1>World of WarCrush</h1>
 <p>Quel membre du Clan Phénix fera le meilleur score avant la sortie de la Saison 2 ?</p>
 <p>Le vainqueur (capture d'écran à l'appui) remportera 40 000 po au lancement de Terremine(r) !</p>
+   <!-- Affichage du temps restant -->
+    <p>Temps restant : <span id="timer">03:00</span></p>
+
+    <!-- Script pour gérer le temps limité -->
+    <script>
+        function endGame() {
+            alert("Temps écoulé ! Fin de la partie.");
+            // Ici, ajoute ce qu'il faut pour bloquer l'interaction du joueur
+        }
+
+        let timeLeft = 180; // 3 minutes en secondes
+        let timerElement = document.getElementById("timer");
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+
+        let timerInterval = setInterval(updateTimer, 1000);
+        setTimeout(endGame, 180000); // 3 minutes = 180000 ms
+    </script>
 Score : <span id="score">0</span><br>
 <button id="reset">Réinitialiser</button>
 </div>
