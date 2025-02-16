@@ -7,477 +7,490 @@
 <style>
 /* • Styles généraux et background dynamique */
 body {
-margin: 0;
-padding: 0;
-font-family: 'Arial', sans-serif;
-background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/disp/12160163963525.5ac2c6df7935c.jpg');
-display: flex;
-justify-content: center;
-align-items: center;
-min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/disp/12160163963525.5ac2c6df7935c.jpg');
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 /* • Conteneur principal du jeu */
 #game {
-width: 100%;
-max-width: 480px;
-background: rgba(255, 255, 255, 0.95);
-border-radius: 10px;
-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-padding: 10px;
-box-sizing: border-box;
-margin: 10px;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 10px;
+  position: relative; /* Nécessaire pour l'overlay de fin de partie */
 }
 
 #header {
-text-align: center;
-margin-bottom: 10px;
-color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 #header h1 {
-font-size: 2em;
-margin: 0.2em 0;
+  font-size: 2em;
+  margin: 0.2em 0;
 }
 
 #header span {
-font-weight: bold;
-font-size: 1.2em;
-color: #a83279;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #a83279;
 }
 
 #reset {
-background: #a83279;
-color: #fff;
-border: none;
-border-radius: 5px;
-padding: 5px 10px;
-font-size: 1em;
-cursor: pointer;
-margin-top: 5px;
-transition: background-color 0.3s ease;
+  background: #a83279;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: background-color 0.3s ease;
 }
 
 #reset:hover {
-background: #d354ab;
+  background: #d354ab;
 }
 
 /* • Plateau de jeu en grille (8×8) */
 #board {
-display: grid;
-grid-template-columns: repeat(8, 1fr);
-grid-gap: 5px;
-background: #ffe6e6;
-padding: 5px;
-border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-gap: 5px;
+  background: #ffe6e6;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 /* • Style de chaque case (tile) */
 .tile {
-width: 100%;
-padding-top: 100%; /* Pour obtenir des carrés */
-position: relative;
-border-radius: 5px;
-overflow: hidden;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-cursor: pointer;
-background: #fff;
-transition: transform 0.3s ease;
+  width: 100%;
+  padding-top: 100%; /* Pour obtenir des carrés */
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  background: #fff;
+  transition: transform 0.3s ease;
 }
 
 /* • Ajout d'un effet de sélection (agrandissement et contour coloré) */
 .tile.selected {
-border: 3px solid #ff5e78;
-transform: scale(1.1);
-z-index: 2;
+  border: 3px solid #ff5e78;
+  transform: scale(1.1);
+  z-index: 2;
 }
 
 .tile img {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-object-fit: cover;
-border-radius: 5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 /* • Animation quand une tuile disparaît (fade out, réduction et rotation) */
 .tile.removing {
-animation: fadeOut 0.5s forwards;
+  animation: fadeOut 0.5s forwards;
 }
 
 @keyframes fadeOut {
-to {
-opacity: 0;
-transform: scale(0.5) rotate(360deg);
-}
+  to {
+    opacity: 0;
+    transform: scale(0.5) rotate(360deg);
+  }
 }
 
 /* • Animation d'apparition pour une nouvelle tuile (chute depuis le haut) */
 .tile.new {
-animation: dropIn 0.5s forwards;
+  animation: dropIn 0.5s forwards;
 }
 
 @keyframes dropIn {
-from {
-transform: translateY(-100%);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* • Animation pour l'échange (swap) */
 .tile.swap {
-animation: swapAnim 0.3s;
+  animation: swapAnim 0.3s;
 }
 
 @keyframes swapAnim {
-0% { transform: scale(0.9); }
-50% { transform: scale(1.1); }
-100% { transform: scale(1); }
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 </style>
 </head>
 <body>
 <div id="game">
-<div id="header">
-<h1>World of WarCrush</h1>
-<p>Quel membre du Clan Phénix fera le meilleur score avant la sortie de la Saison 2 ?</p>
-<p>Le vainqueur (capture d'écran à l'appui) remportera 40 000 po au lancement de Terremine(r) !</p>
- <p id="time-message">Il vous reste 2 minutes et 0 secondes !</p>
+  <div id="header">
+    <h1>World of WarCrush</h1>
+    <p>Quel membre du Clan Phénix fera le meilleur score avant la sortie de la Saison 2 ?</p>
+    <p>Le vainqueur (capture d'écran à l'appui) remportera 40 000 po au lancement de Terremine(r) !</p>
     <p>Temps restant : <span id="timer">02:00</span></p>
-
-    <!-- Script -->
-    <script>
-        let timeLeft = 120; // 2 minutes en secondes
-        let timerElement = document.getElementById("timer");
-        let timeMessage = document.getElementById("time-message");
-
-        function updateTimer() {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-
-            // Met à jour l'affichage du temps
-            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            timeMessage.textContent = `Il vous reste ${minutes} minute(s) et ${seconds} seconde(s) !`;
-
-            timeLeft--;
-
-            if (timeLeft < 0) {
-                clearInterval(timerInterval);
-                endGame();
-            }
-        }
-
-        function endGame() {
-            alert("Temps écoulé ! Fais une capture d'écran de ton score avec ce message visible pour participer au défi du Clan Phénix !");
-            
-            // Désactiver les boutons et champs de saisie
-            document.getElementById("game-button").disabled = true;
-            document.getElementById("game-input").disabled = true;
-
-            // Bloquer les clics sur la page
-            document.body.style.pointerEvents = "none";
-        }
-
-        let timerInterval = setInterval(updateTimer, 1000);
-        setTimeout(endGame, 120000); // 2 minutes = 120000 ms
-    </script>
-Score : <span id="score">0</span><br>
-<button id="reset">Réinitialiser</button>
-</div>
-<div id="board"></div>
+    <button id="reset">Réinitialiser</button>
+  </div>
+  <div id="board"></div>
 </div>
 
 <script>
-/*************************************************
-* World of WarCrush – Version Candy Crush revisitée *
-* (Utilise les images depuis https://forum.canardpc.com/images/smilies/)
-*************************************************/
+    let timeLeft = 120; // 2 minutes en secondes
+    let timerElement = document.getElementById("timer");
 
-// Dimensions du plateau
-const rows = 8, cols = 8;
-// Liste des images utilisées (7 au total)
-const images = [
-"hunter.png",
-"paladin.png",
-"priest.png",
-"shaman.png",
-"warrior.png"
-];
-const baseurl = "./";
+    function updateTimer() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        timeLeft--;
+        if (timeLeft < 0) {
+            clearInterval(timerInterval);
+            endGame();
+        }
+    }
 
-// Variables globales
-let board = [];
-let score = 0;
-let selectedTile = null; // Pour mémoriser la tuile cliquée
-const boardElem = document.getElementById("board");
-const scoreElem = document.getElementById("score");
-const resetButton = document.getElementById("reset");
+    function endGame() {
+        clearInterval(timerInterval);
+        // Création de l'écran de fin de partie
+        const gameContainer = document.getElementById("game");
+        const overlay = document.createElement("div");
+        overlay.id = "game-over";
+        overlay.style.position = "absolute";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column";
+        overlay.style.justifyContent = "center";
+        overlay.style.alignItems = "center";
+        overlay.style.color = "#fff";
+        overlay.style.fontSize = "1.5em";
+        overlay.innerHTML = `<p>Fin de la partie</p><p>Score final : ${score}</p>`;
+        const restartBtn = document.createElement("button");
+        restartBtn.textContent = "Recommencer";
+        restartBtn.style.padding = "10px 20px";
+        restartBtn.style.fontSize = "1em";
+        restartBtn.style.marginTop = "20px";
+        restartBtn.addEventListener("click", function(){
+            overlay.remove();
+            resetButton.click();
+        });
+        overlay.appendChild(restartBtn);
+        gameContainer.appendChild(overlay);
+    }
 
-// Initialisation – charge l'état sauvegardé ou crée un nouveau plateau
-function initGame() {
-loadGame();
-if (!board || board.length === 0) {
-board = [];
-for (let r = 0; r < rows; r++) {
-board[r] = [];
-for (let c = 0; c < cols; c++) {
-board[r][c] = randomTile();
-}
-}
-}
-drawBoard();
-updateScore(score); // Met à jour l'affichage du score
-}
+    let timerInterval = setInterval(updateTimer, 1000);
 
-// Sauvegarde l'état du jeu dans localStorage
-function saveGame() {
-const gameState = { board: board, score: score };
-localStorage.setItem("lapinCrushState", JSON.stringify(gameState));
-}
+    /*************************************************
+    * World of WarCrush – Version Candy Crush revisitée *
+    * (Utilise les images depuis https://forum.canardpc.com/images/smilies/)
+    *************************************************/
 
-// Charge l'état sauvegardé depuis localStorage
-function loadGame() {
-const savedState = localStorage.getItem("lapinCrushState");
-if (savedState) {
-try {
-const gameState = JSON.parse(savedState);
-board = gameState.board;
-score = gameState.score;
-} catch (e) {
-console.error("Erreur lors du chargement de l'état du jeu", e);
-board = [];
-score = 0;
-}
-}
-}
+    // Dimensions du plateau
+    const rows = 8, cols = 8;
+    // Liste des images utilisées (5 au total)
+    const images = [
+      "hunter.png",
+      "paladin.png",
+      "priest.png",
+      "shaman.png",
+      "warrior.png"
+    ];
+    const baseurl = "./";
 
-// Bouton de réinitialisation
-resetButton.addEventListener("click", function(){
-localStorage.removeItem("lapinCrushState");
-board = [];
-score = 0;
-selectedTile = null;
-initGame();
-});
+    // Variables globales
+    let board = [];
+    let score = 0;
+    let selectedTile = null; // Pour mémoriser la tuile cliquée
+    const boardElem = document.getElementById("board");
+    const resetButton = document.getElementById("reset");
 
-// Retourne un index aléatoire dans le tableau images
-function randomTile() {
-return Math.floor(Math.random() * images.length);
-}
+    // Initialisation – charge l'état sauvegardé ou crée un nouveau plateau
+    function initGame() {
+      loadGame();
+      if (!board || board.length === 0) {
+        board = [];
+        for (let r = 0; r < rows; r++) {
+          board[r] = [];
+          for (let c = 0; c < cols; c++) {
+            board[r][c] = randomTile();
+          }
+        }
+      }
+      drawBoard();
+      updateScore(score); // Met à jour l'affichage du score
+    }
 
-// Dessine (ou redessine) le plateau de jeu dans le DOM
-function drawBoard() {
-boardElem.innerHTML = "";
-for (let r = 0; r < rows; r++) {
-for (let c = 0; c < cols; c++) {
-const tileValue = board[r][c];
-const tileDiv = document.createElement("div");
-tileDiv.classList.add("tile");
-// Pour lancer l'animation « drop »
-tileDiv.classList.add("new");
-tileDiv.dataset.row = r;
-tileDiv.dataset.col = c;
+    // Sauvegarde l'état du jeu dans localStorage
+    function saveGame() {
+      const gameState = { board: board, score: score };
+      localStorage.setItem("lapinCrushState", JSON.stringify(gameState));
+    }
 
-// Enlever la classe "new" une fois l'animation terminée
-tileDiv.addEventListener("animationend", function() {
-tileDiv.classList.remove("new");
-});
+    // Charge l'état sauvegardé depuis localStorage
+    function loadGame() {
+      const savedState = localStorage.getItem("lapinCrushState");
+      if (savedState) {
+        try {
+          const gameState = JSON.parse(savedState);
+          board = gameState.board;
+          score = gameState.score;
+        } catch (e) {
+          console.error("Erreur lors du chargement de l'état du jeu", e);
+          board = [];
+          score = 0;
+        }
+      }
+    }
 
-const imgElem = document.createElement("img");
-imgElem.src = baseurl + images[tileValue];
-tileDiv.appendChild(imgElem);
+    // Bouton de réinitialisation
+    resetButton.addEventListener("click", function(){
+      localStorage.removeItem("lapinCrushState");
+      board = [];
+      score = 0;
+      selectedTile = null;
+      initGame();
+    });
 
-// Ajout d'un écouteur de clic (compatible mobile)
-tileDiv.addEventListener("click", tileClick);
+    // Retourne un index aléatoire dans le tableau images
+    function randomTile() {
+      return Math.floor(Math.random() * images.length);
+    }
 
-boardElem.appendChild(tileDiv);
-}
-}
-}
+    // Dessine (ou redessine) le plateau de jeu dans le DOM
+    function drawBoard() {
+      boardElem.innerHTML = "";
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const tileValue = board[r][c];
+          const tileDiv = document.createElement("div");
+          tileDiv.classList.add("tile");
+          // Pour lancer l'animation « drop »
+          tileDiv.classList.add("new");
+          tileDiv.dataset.row = r;
+          tileDiv.dataset.col = c;
 
-// Gère le clic sur une tuile
-function tileClick(e) {
-const tileDiv = e.currentTarget;
-const r = parseInt(tileDiv.dataset.row);
-const c = parseInt(tileDiv.dataset.col);
+          // Enlever la classe "new" une fois l'animation terminée
+          tileDiv.addEventListener("animationend", function() {
+            tileDiv.classList.remove("new");
+          });
 
-// S'il n'y a pas encore de sélection, on marque la tuile cliquée
-if (!selectedTile) {
-selectedTile = { row: r, col: c, element: tileDiv };
-tileDiv.classList.add("selected");
-} else {
-// Si une tuile est déjà sélectionnée : on vérifie qu'elle soit adjacente
-if (isAdjacent(selectedTile.row, selectedTile.col, r, c)) {
-// On enlève la classe de sélection sur la première tuile
-selectedTile.element.classList.remove("selected");
-// On effectue l'échange
-swapTiles(selectedTile.row, selectedTile.col, r, c, true);
-selectedTile = null;
-} else {
-// Sinon, on change la sélection
-selectedTile.element.classList.remove("selected");
-selectedTile = { row: r, col: c, element: tileDiv };
-tileDiv.classList.add("selected");
-}
-}
-}
+          const imgElem = document.createElement("img");
+          imgElem.src = baseurl + images[tileValue];
+          tileDiv.appendChild(imgElem);
 
-// Retourne true si les cases sont adjacentes (haut, bas, gauche ou droite)
-function isAdjacent(r1, c1, r2, c2) {
-return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
-}
+          // Ajout d'un écouteur de clic (compatible mobile)
+          tileDiv.addEventListener("click", tileClick);
 
-// Procédure d'échange de deux tuiles et vérification des correspondances
-function swapTiles(r1, c1, r2, c2, playerMove) {
-// Échange dans le plateau
-[board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
-drawBoard();
+          boardElem.appendChild(tileDiv);
+        }
+      }
+    }
 
-// Animation de swap : on ajoute la classe « swap » aux deux tuiles échangées
-let tile1 = document.querySelector('.tile[data-row="'+r1+'"][data-col="'+c1+'"]');
-let tile2 = document.querySelector('.tile[data-row="'+r2+'"][data-col="'+c2+'"]');
-if(tile1) tile1.classList.add("swap");
-if(tile2) tile2.classList.add("swap");
+    // Gère le clic sur une tuile
+    function tileClick(e) {
+      const tileDiv = e.currentTarget;
+      const r = parseInt(tileDiv.dataset.row);
+      const c = parseInt(tileDiv.dataset.col);
 
-// Vérification des correspondances
-setTimeout(()=> {
-const matches = findMatches();
-if (matches.length > 0) {
-setTimeout(()=> { removeMatches(matches); }, 300);
-} else {
-// Si aucune correspondance et que c'est un coup joueur, on annule l'échange
-if (playerMove) {
-setTimeout(()=> {
-[board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
-drawBoard();
-}, 300);
-}
-}
-}, 300);
-}
+      // S'il n'y a pas encore de sélection, on marque la tuile cliquée
+      if (!selectedTile) {
+        selectedTile = { row: r, col: c, element: tileDiv };
+        tileDiv.classList.add("selected");
+      } else {
+        // Si une tuile est déjà sélectionnée : on vérifie qu'elle soit adjacente
+        if (isAdjacent(selectedTile.row, selectedTile.col, r, c)) {
+          // On enlève la classe de sélection sur la première tuile
+          selectedTile.element.classList.remove("selected");
+          // On effectue l'échange
+          swapTiles(selectedTile.row, selectedTile.col, r, c, true);
+          selectedTile = null;
+        } else {
+          // Sinon, on change la sélection
+          selectedTile.element.classList.remove("selected");
+          selectedTile = { row: r, col: c, element: tileDiv };
+          tileDiv.classList.add("selected");
+        }
+      }
+    }
 
-// Recherche des correspondances (3 tuiles ou plus de même type consécutives)
-function findMatches() {
-let matches = [];
-let matched = Array(rows).fill().map(() => Array(cols).fill(false));
+    // Retourne true si les cases sont adjacentes (haut, bas, gauche ou droite)
+    function isAdjacent(r1, c1, r2, c2) {
+      return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
+    }
 
-// Vérification horizontale
-for (let r = 0; r < rows; r++) {
-let matchLength = 1;
-for (let c = 0; c < cols; c++) {
-if (c < cols - 1 && board[r][c] === board[r][c + 1]) {
-matchLength++;
-} else {
-if (matchLength >= 3) {
-for (let k = 0; k < matchLength; k++) {
-matched[r][c - k] = true;
-}
-}
-matchLength = 1;
-}
-}
-}
+    // Procédure d'échange de deux tuiles et vérification des correspondances
+    function swapTiles(r1, c1, r2, c2, playerMove) {
+      // Échange dans le plateau
+      [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+      drawBoard();
 
-// Vérification verticale
-for (let c = 0; c < cols; c++) {
-let matchLength = 1;
-for (let r = 0; r < rows; r++) {
-if (r < rows - 1 && board[r][c] === board[r + 1][c]) {
-matchLength++;
-} else {
-if (matchLength >= 3) {
-for (let k = 0; k < matchLength; k++) {
-matched[r - k][c] = true;
-}
-}
-matchLength = 1;
-}
-}
-}
+      // Animation de swap : on ajoute la classe « swap » aux deux tuiles échangées
+      let tile1 = document.querySelector('.tile[data-row="'+r1+'"][data-col="'+c1+'"]');
+      let tile2 = document.querySelector('.tile[data-row="'+r2+'"][data-col="'+c2+'"]');
+      if(tile1) tile1.classList.add("swap");
+      if(tile2) tile2.classList.add("swap");
 
-// Compilation des cases à supprimer
-for (let r = 0; r < rows; r++) {
-for (let c = 0; c < cols; c++) {
-if (matched[r][c]) {
-matches.push({ row: r, col: c });
-}
-}
-}
-return matches;
-}
+      // Vérification des correspondances
+      setTimeout(()=> {
+        const matches = findMatches();
+        if (matches.length > 0) {
+          setTimeout(()=> { removeMatches(matches); }, 300);
+        } else {
+          // Si aucune correspondance et que c'est un coup joueur, on annule l'échange
+          if (playerMove) {
+            setTimeout(()=> {
+              [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+              drawBoard();
+            }, 300);
+          }
+        }
+      }, 300);
+    }
 
-// Déclenche la suppression (animation + mise à jour du plateau) des tuiles faisant partie d'une correspondance
-function removeMatches(matches) {
-if (matches.length === 0) return;
+    // Recherche des correspondances (3 tuiles ou plus de même type consécutives)
+    function findMatches() {
+      let matches = [];
+      let matched = Array(rows).fill().map(() => Array(cols).fill(false));
 
-// Pour chaque case correspondante, on passe sa valeur à null et on lance l'animation de disparition
-matches.forEach(coord => {
-board[coord.row][coord.col] = null;
-const tileElem = document.querySelector('.tile[data-row="'+coord.row+'"][data-col="'+coord.col+'"]');
-if(tileElem) {
-tileElem.classList.add("removing");
-}
-});
+      // Vérification horizontale
+      for (let r = 0; r < rows; r++) {
+        let matchLength = 1;
+        for (let c = 0; c < cols; c++) {
+          if (c < cols - 1 && board[r][c] === board[r][c + 1]) {
+            matchLength++;
+          } else {
+            if (matchLength >= 3) {
+              for (let k = 0; k < matchLength; k++) {
+                matched[r][c - k] = true;
+              }
+            }
+            matchLength = 1;
+          }
+        }
+      }
 
-// Mise à jour du score (+10 points par tuile supprimée)
-updateScore(score + matches.length * 10);
+      // Vérification verticale
+      for (let c = 0; c < cols; c++) {
+        let matchLength = 1;
+        for (let r = 0; r < rows; r++) {
+          if (r < rows - 1 && board[r][c] === board[r + 1][c]) {
+            matchLength++;
+          } else {
+            if (matchLength >= 3) {
+              for (let k = 0; k < matchLength; k++) {
+                matched[r - k][c] = true;
+              }
+            }
+            matchLength = 1;
+          }
+        }
+      }
 
-// Une fois l'animation terminée, laisser les tuiles "chuter"
-setTimeout(()=> {
-collapseTiles();
-}, 500);
-}
+      // Compilation des cases à supprimer
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (matched[r][c]) {
+            matches.push({ row: r, col: c });
+          }
+        }
+      }
+      return matches;
+    }
 
-// Met à jour l'affichage du score et sauvegarde l'état
-function updateScore(newScore) {
-score = newScore;
-scoreElem.textContent = score;
-saveGame();
-}
+    // Déclenche la suppression (animation + mise à jour du plateau) des tuiles faisant partie d'une correspondance
+    function removeMatches(matches) {
+      if (matches.length === 0) return;
 
-// Fait "tomber" les tuiles pour combler les espaces vides, et ajoute de nouvelles tuiles en haut
-function collapseTiles() {
-for (let c = 0; c < cols; c++) {
-let colTiles = [];
-for (let r = 0; r < rows; r++) {
-if (board[r][c] !== null) {
-colTiles.push(board[r][c]);
-}
-}
-// Calcul du nombre de tuiles manquantes dans la colonne
-const missing = rows - colTiles.length;
-let newTiles = [];
-for (let i = 0; i < missing; i++) {
-newTiles.push(randomTile());
-}
-// La nouvelle colonne se construit avec les nouvelles tuiles en haut
-let boardColumn = newTiles.concat(colTiles);
-for (let r = 0; r < rows; r++) {
-board[r][c] = boardColumn[r];
-}
-}
-drawBoard();
-saveGame();
+      // Pour chaque case correspondante, on passe sa valeur à null et on lance l'animation de disparition
+      matches.forEach(coord => {
+        board[coord.row][coord.col] = null;
+        const tileElem = document.querySelector('.tile[data-row="'+coord.row+'"][data-col="'+coord.col+'"]');
+        if(tileElem) {
+          tileElem.classList.add("removing");
+        }
+      });
 
-// Vérifier récursivement les nouvelles correspondances susceptibles d'être apparues
-setTimeout(()=> {
-const newMatches = findMatches();
-if(newMatches.length > 0){
-setTimeout(()=> {
-removeMatches(newMatches);
-}, 300);
-}
-}, 300);
-}
+      // Mise à jour du score (+10 points par tuile supprimée)
+      updateScore(score + matches.length * 10);
 
-// Initialisation du jeu
-initGame();
+      // Une fois l'animation terminée, laisser les tuiles "chuter"
+      setTimeout(()=> {
+        collapseTiles();
+      }, 500);
+    }
+
+    // Met à jour l'affichage du score et sauvegarde l'état
+    function updateScore(newScore) {
+      score = newScore;
+      saveGame();
+    }
+
+    // Fait "tomber" les tuiles pour combler les espaces vides, et ajoute de nouvelles tuiles en haut
+    function collapseTiles() {
+      for (let c = 0; c < cols; c++) {
+        let colTiles = [];
+        for (let r = 0; r < rows; r++) {
+          if (board[r][c] !== null) {
+            colTiles.push(board[r][c]);
+          }
+        }
+        // Calcul du nombre de tuiles manquantes dans la colonne
+        const missing = rows - colTiles.length;
+        let newTiles = [];
+        for (let i = 0; i < missing; i++) {
+          newTiles.push(randomTile());
+        }
+        // La nouvelle colonne se construit avec les nouvelles tuiles en haut
+        let boardColumn = newTiles.concat(colTiles);
+        for (let r = 0; r < rows; r++) {
+          board[r][c] = boardColumn[r];
+        }
+      }
+      drawBoard();
+      saveGame();
+
+      // Vérifier récursivement les nouvelles correspondances susceptibles d'être apparues
+      setTimeout(()=> {
+        const newMatches = findMatches();
+        if(newMatches.length > 0){
+          setTimeout(()=> {
+            removeMatches(newMatches);
+          }, 300);
+        }
+      }, 300);
+    }
+
+    // Initialisation du jeu
+    initGame();
 </script>
+
+<!-- Ajout de la musique de fond via le widget SoundCloud, en boucle et de façon invisible -->
+<iframe style="display: none;" width="0" height="0" scrolling="no" frameborder="no" allow="autoplay" 
+src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/bits-and-hits/stormwind-world-of-warcraft%3Fin%3Dbits-and-hits/sets/world-of-warcraft-but-its-lofi&auto_play=true&loop=true"></iframe>
+
 </body>
 </html>
