@@ -3,14 +3,14 @@
 <meta charset="UTF-8">
 <!-- Pour un affichage adapté aux mobiles -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lapin Crush</title>
+<title>World of WarCrush</title>
 <style>
 /* • Styles généraux et background dynamique */
 body {
 margin: 0;
 padding: 0;
 font-family: 'Arial', sans-serif;
-background-image: url('https://bnetcmsus-a.akamaihd.net/cms/content_entry_media/FJPT5455KR5K1589912863345.jpg');
+background-image: url('https://mir-s3-cdn-cf.behance.net/project_modules/disp/12160163963525.5ac2c6df7935c.jpg');
 display: flex;
 justify-content: center;
 align-items: center;
@@ -145,7 +145,48 @@ animation: swapAnim 0.3s;
 <body>
 <div id="game">
 <div id="header">
-<h1>Lapin Crush</h1>
+<h1>World of WarCrush</h1>
+<p>Quel membre du Clan Phénix fera le meilleur score avant la sortie de la Saison 2 ?</p>
+<p>Le vainqueur (capture d'écran à l'appui) remportera 40 000 po au lancement de Terremine(r) !</p>
+ <p id="time-message">Il vous reste 2 minutes et 0 secondes !</p>
+    <p>Temps restant : <span id="timer">02:00</span></p>
+
+    <!-- Script -->
+    <script>
+        let timeLeft = 120; // 2 minutes en secondes
+        let timerElement = document.getElementById("timer");
+        let timeMessage = document.getElementById("time-message");
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            // Met à jour l'affichage du temps
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeMessage.textContent = `Il vous reste ${minutes} minute(s) et ${seconds} seconde(s) !`;
+
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+
+        function endGame() {
+            alert("Temps écoulé ! Fais une capture d'écran de ton score avec ce message visible pour participer au défi du Clan Phénix !");
+            
+            // Désactiver les boutons et champs de saisie
+            document.getElementById("game-button").disabled = true;
+            document.getElementById("game-input").disabled = true;
+
+            // Bloquer les clics sur la page
+            document.body.style.pointerEvents = "none";
+        }
+
+        let timerInterval = setInterval(updateTimer, 1000);
+        setTimeout(endGame, 120000); // 2 minutes = 120000 ms
+    </script>
 Score : <span id="score">0</span><br>
 <button id="reset">Réinitialiser</button>
 </div>
@@ -154,7 +195,7 @@ Score : <span id="score">0</span><br>
 
 <script>
 /*************************************************
-* Lapin Crush – Version Candy Crush revisitée *
+* World of WarCrush – Version Candy Crush revisitée *
 * (Utilise les images depuis https://forum.canardpc.com/images/smilies/)
 *************************************************/
 
