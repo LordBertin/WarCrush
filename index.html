@@ -148,6 +148,45 @@ animation: swapAnim 0.3s;
 <h1>World of WarCrush</h1>
 <p>Quel membre du Clan Phénix fera le meilleur score avant la sortie de la Saison 2 ?</p>
 <p>Le vainqueur (capture d'écran à l'appui) remportera 40 000 po au lancement de Terremine(r) !</p>
+ <p id="time-message">Il vous reste 2 minutes et 0 secondes !</p>
+    <p>Temps restant : <span id="timer">02:00</span></p>
+
+    <!-- Script -->
+    <script>
+        let timeLeft = 120; // 2 minutes en secondes
+        let timerElement = document.getElementById("timer");
+        let timeMessage = document.getElementById("time-message");
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            // Met à jour l'affichage du temps
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeMessage.textContent = `Il vous reste ${minutes} minute(s) et ${seconds} seconde(s) !`;
+
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+
+        function endGame() {
+            alert("Temps écoulé ! Fais une capture d'écran de ton score avec ce message visible pour participer au défi du Clan Phénix !");
+            
+            // Désactiver les boutons et champs de saisie
+            document.getElementById("game-button").disabled = true;
+            document.getElementById("game-input").disabled = true;
+
+            // Bloquer les clics sur la page
+            document.body.style.pointerEvents = "none";
+        }
+
+        let timerInterval = setInterval(updateTimer, 1000);
+        setTimeout(endGame, 120000); // 2 minutes = 120000 ms
+    </script>
 Score : <span id="score">0</span><br>
 <button id="reset">Réinitialiser</button>
 </div>
